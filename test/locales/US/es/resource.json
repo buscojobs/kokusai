@@ -1,0 +1,9 @@
+{
+  "lang": "Español",
+  "currency": {
+    "name": "Dolar americano"
+  },
+  "messages": {
+    "welcome": "Bienvenido!"
+  }
+}

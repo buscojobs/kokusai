@@ -17,5 +17,9 @@
     "underscore": "~1.6.0",
     "merge-defaults": "~0.2.1",
     "promise": "~5.0.0"
+  },
+  "devDependencies": {
+    "chai": "~1.9.1",
+    "mocha": "~1.21.0"
   }
 }

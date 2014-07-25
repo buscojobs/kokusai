@@ -92,6 +92,7 @@ var mergeConfig = function(config, space, lang, options) {
   @param options.lang: The language code
 */
 module.exports.load = function(name, options) {
+  options = options || {};
   var space = options.space || 'default'
     , lang = options.lang;
   options.name = name;

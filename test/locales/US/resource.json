@@ -1,0 +1,13 @@
+{
+  "country": "United States of America",
+  "capital": "Washington D.C.",
+  "currency": {
+    "code": "USD",
+    "name": "US Dollar"
+  },
+  "state": {
+    "Texas": {
+      "capital": "Austin"
+    }
+  }
+}
