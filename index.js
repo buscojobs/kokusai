@@ -1,3 +1,5 @@
+'use strict';
+
 var locale = require('./locale');
 
 module.exports.getLocale = locale.load;

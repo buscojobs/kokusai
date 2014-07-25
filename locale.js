@@ -83,7 +83,7 @@ var mergeConfig = function(config, space, lang, options) {
       fulfill(config);
     });
   });
-}
+};
 
 /* Loads a localized configuration file 
   @param name: The configuration file name
@@ -116,4 +116,4 @@ module.exports.load = function(name, options) {
 
     return Promise.resolve(locale);
   });
-}
+};
