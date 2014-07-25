@@ -1,5 +1,7 @@
 # Kokusai
 
+[ ![Codeship Status for buscojobs/kokusai](https://codeship.io/projects/78bf0130-f633-0131-99a0-6a4355d86ffa/status)](https://codeship.io/projects/28457)
+
 **Kokusai** es un módulo de internacionalización para Kraken, que maneja las
 traducciones y configuraciones del sitio para cada país e idioma.
 
