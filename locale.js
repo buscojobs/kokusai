@@ -27,11 +27,11 @@ Locale.prototype.get = function(key) {
       if (typeof(ptr) === 'object')
         ptr = ptr[route[prop]];
       else
-        return null;
+        return undefined;
     }
     return ptr;
   }
-  return null;
+  return undefined;
 };
 
 // Loads a configuration file
@@ -59,7 +59,12 @@ var loadContent = function(space, lang, options) {
           if(err){
             fulfill({}, options);
           } else {
-            fulfill(JSON.parse(data), options);
+            try {
+              fulfill(JSON.parse(data), options);
+            } catch(err){
+              err.message = 'Error parsing file "' + config_path + '"';
+              throw err;
+            }
           }
         });
       } else {
