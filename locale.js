@@ -10,9 +10,9 @@ _.defaults = require('merge-defaults');
 // Represents a localized configuration
 var Locale = function(options) {
   this.space = options.space;
-  
+
   this.lang = options.lang;
-  
+
   this.name = options.name;
 
   this.content = {};
@@ -36,15 +36,14 @@ Locale.prototype.get = function(key) {
 
 // Loads a configuration file
 var loadContent = function(space, lang, options) {
-  var base_path = options.base_path || 'locales',
-      parts = [ base_path ];
-  
+  var parts = [ options.base_path ];
+
   if(typeof space === 'string')
     parts.push(space);
-  
+
   if(typeof lang === 'string')
     parts.push(lang);
-  
+
   parts.push(options.name);
 
   var config_path = path.join.apply(undefined, parts);
@@ -74,6 +73,20 @@ var loadContent = function(space, lang, options) {
   });
 };
 
+// Loads the default language from base_path/space/lang.config
+var loadDefaultLang = function(space, options){
+  var config_path = path.join(options.base_path, space, 'lang.config');
+  var lang = null;
+  if(fs.existsSync(config_path)){
+    var content = fs.readFileSync(config_path, { encoding: 'utf8' });
+    var match = content.match(/lang=(\w{2})/);
+    if(Array.isArray(match)){
+      lang = match[1];
+    }
+  }
+  return lang;
+};
+
 // Merges a partial configuration with the content of another configuration file
 var mergeConfig = function(config, space, lang, options) {
   return new Promise(function(fulfill, reject){
@@ -85,7 +98,7 @@ var mergeConfig = function(config, space, lang, options) {
   });
 };
 
-/* Loads a localized configuration file 
+/* Loads a localized configuration file
   @param name: The configuration file name
   @param options.base_path: Base path for localization files (default: 'locales')
   @param options.space: The space name or country code
@@ -93,9 +106,15 @@ var mergeConfig = function(config, space, lang, options) {
 */
 module.exports.load = function(name, options) {
   options = options || {};
+  options.base_path = options.base_path || 'locales';
+
   var space = options.space || 'default'
     , lang = options.lang;
   options.name = name;
+
+  if(!lang){
+    lang = loadDefaultLang(space, options);
+  }
 
   // Load the most specific configuration
   return mergeConfig({}, space, lang, options)
@@ -109,7 +128,7 @@ module.exports.load = function(name, options) {
   })
   .then(function(config){
     // Finally merge it with the default configuration
-    return mergeConfig(config, 'default', null, options);  
+    return mergeConfig(config, 'default', null, options);
   })
   .then(function(config){
     var locale = new Locale(options);

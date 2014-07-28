@@ -76,14 +76,14 @@ describe('Locales', function(){
       expect(locale.get('commonKey')).to.be.equal('commonValue');
     });
 
-    it('should not load a language specific configuration', function(){
-      expect(locale.get('lang')).to.be.equal(undefined);
-      expect(locale.get('messages.welcome')).to.be.equal(undefined);
+    it('should load the default language configuration', function(){
+      expect(locale.get('lang')).to.be.equal('English');
+      expect(locale.get('messages.welcome')).to.be.equal('Welcome home!');
     });
 
     it('should not load a language default configuration', function(){
-      expect(locale.get('key1')).to.be.equal(undefined);
-      expect(locale.get('key2')).to.be.equal(undefined);
+      expect(locale.get('key1')).to.be.equal('default value 1');
+      expect(locale.get('key2')).to.be.equal('default value 2');
     });
   });
 
