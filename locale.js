@@ -3,9 +3,12 @@
 var path    = require('path'),
     fs      = require('fs'),
     Promise = require('promise'),
-    _       = require('underscore');
+    _       = require('underscore'),
+    Cache   = require('./cache');
 
 _.defaults = require('merge-defaults');
+
+var cache = new Cache();
 
 // Represents a localized configuration
 var Locale = function(options) {
@@ -107,10 +110,17 @@ var mergeConfig = function(config, space, lang, options) {
 module.exports.load = function(name, options) {
   options = options || {};
   options.base_path = options.base_path || 'locales';
+  options.space = options.space || 'default';
 
-  var space = options.space || 'default'
+  var space = options.space
     , lang = options.lang;
   options.name = name;
+
+  // If we found a proper configuration cached, we return it
+  var cached = cache.getLocale(options);
+  if(cached){
+    return Promise.resolve(cached);
+  }
 
   if(!lang){
     lang = loadDefaultLang(space, options);
@@ -133,6 +143,7 @@ module.exports.load = function(name, options) {
   .then(function(config){
     var locale = new Locale(options);
     locale.content = config;
+    cache.saveLocale(options, locale);
 
     return Promise.resolve(locale);
   });
