@@ -1,10 +1,15 @@
 'use strict';
+/* jshint ignore:start */
 
 var expect  = require('chai').expect,
-    kokusai = require('../'),
+    Kokusai = require('../'),
     path    = 'test/locales';
 
 describe('Locales', function(){
+
+  before(function(){
+    this.kokusai = new Kokusai();
+  });
 
   describe('# specific country / specific language', function(){
 
@@ -12,10 +17,12 @@ describe('Locales', function(){
         es   = null;
 
     before(function(done){
-      kokusai.getLocale('resource', { space: 'US', lang: 'en', base_path: path })
+      var self = this;
+      
+      self.kokusai.load('resource', { space: 'US', lang: 'en', base_path: path })
       .then(function(locale){
         en = locale;
-        return kokusai.getLocale('resource', { space: 'US', lang: 'es', base_path: path });
+        return self.kokusai.load('resource', { space: 'US', lang: 'es', base_path: path });
       })
       .then(function(locale){
         es = locale;
@@ -60,7 +67,7 @@ describe('Locales', function(){
     var locale   = null;
 
     before(function(done){
-      kokusai.getLocale('resource', { space: 'US', base_path: path })
+      this.kokusai.load('resource', { space: 'US', base_path: path })
       .then(function(loaded){
         locale = loaded;
         done();
@@ -91,7 +98,7 @@ describe('Locales', function(){
     var locale   = null;
 
     before(function(done){
-      kokusai.getLocale('resource', { lang: 'en', base_path: path })
+      this.kokusai.load('resource', { lang: 'en', base_path: path })
       .then(function(loaded){
         locale = loaded;
         done();
@@ -122,7 +129,7 @@ describe('Locales', function(){
     var locale   = null;
 
     before(function(done){
-      kokusai.getLocale('resource', { base_path: path })
+      this.kokusai.load('resource', { base_path: path })
       .then(function(loaded){
         locale = loaded;
         done();
@@ -147,7 +154,7 @@ describe('Locales', function(){
     var locale   = null;
 
     before(function(done){
-      kokusai.getLocale('nofile')
+      this.kokusai.load('nofile')
       .then(function(loaded){
         locale = loaded;
         done();
@@ -162,3 +169,5 @@ describe('Locales', function(){
     });
   });
 });
+
+/* jshint ignore:end */
