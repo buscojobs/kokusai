@@ -4,7 +4,8 @@ var path    = require('path'),
     fs      = require('fs'),
     Promise = require('promise'),
     _       = require('underscore'),
-    Cache   = require('./cache');
+    Cache   = require('./cache'),
+    JSON5   = require('json5');
 
 _.defaults = require('merge-defaults');
 
@@ -40,6 +41,7 @@ Locale.prototype.get = function(key) {
 // Loads a configuration file
 var loadContent = function(space, lang, options) {
   var parts = [ options.base_path ];
+  var encoding = options.encoding || 'utf8';
 
   if(typeof space === 'string')
     parts.push(space);
@@ -57,12 +59,12 @@ var loadContent = function(space, lang, options) {
   return new Promise(function(fulfill, reject){
     fs.exists(config_path, function(exists){
       if(exists){
-        fs.readFile(config_path, function(err, data){
+        fs.readFile(config_path, { encoding: encoding }, function(err, data){
           if(err){
             fulfill({}, options);
           } else {
             try {
-              fulfill(JSON.parse(data), options);
+              fulfill(JSON5.parse(data), options);
             } catch(err){
               err.message = 'Error parsing file "' + config_path + '"';
               throw err;
@@ -106,6 +108,7 @@ var mergeConfig = function(config, space, lang, options) {
   @param options.base_path: Base path for localization files (default: 'locales')
   @param options.space: The space name or country code
   @param options.lang: The language code
+  @param options.encoding: The encoding of the resource files (default: 'utf8')
 */
 module.exports.load = function(name, options) {
   options = options || {};

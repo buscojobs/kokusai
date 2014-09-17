@@ -1,6 +1,6 @@
 {
   "name": "kokusai",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Localization middleware for express",
   "main": "index.js",
   "scripts": {
@@ -14,9 +14,10 @@
   "author": "Buscojobs",
   "license": "MIT",
   "dependencies": {
-    "underscore": "~1.6.0",
+    "json5": "^0.2.0",
     "merge-defaults": "~0.2.1",
-    "promise": "~5.0.0"
+    "promise": "~5.0.0",
+    "underscore": "~1.6.0"
   },
   "devDependencies": {
     "chai": "~1.9.1",
