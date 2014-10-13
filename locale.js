@@ -5,6 +5,7 @@ var path    = require('path'),
     Promise = require('promise'),
     _       = require('underscore'),
     Cache   = require('./cache'),
+    utils   = require('./utils'),
     JSON5   = require('json5');
 
 _.defaults = require('merge-defaults');
@@ -18,6 +19,8 @@ var Locale = function(options) {
   this.lang = options.lang;
 
   this.name = options.name;
+
+  this.path = options.base_path;
 
   this.content = {};
 };
@@ -36,6 +39,22 @@ Locale.prototype.get = function(key) {
     return ptr;
   }
   return undefined;
+};
+
+Locale.prototype.calculateDiff = function(){
+  var self = this;
+  var options = { base_path : this.path, name: this.name };
+  var specific;
+
+  // Load the default language content
+  return loadContent(self.space, self.lang, options)
+  .then(function(locale){
+    specific = locale;
+    return loadContent('default', self.lang, options);
+  })
+  .then(function(_default){
+    return utils.calculateDiff(self, specific, _default);
+  });
 };
 
 // Loads a configuration file
