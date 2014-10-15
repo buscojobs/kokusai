@@ -94,12 +94,9 @@ var loadDefaultLang = function(space, options){
 
 // Merges a partial configuration with the content of another configuration file
 var mergeConfig = function(config, space, lang, options) {
-  return new Promise(function(fulfill, reject){
-    loadContent(space, lang, options)
-    .then(function(loaded){
-      config = _.defaults(config, loaded);
-      fulfill(config);
-    });
+  return loadContent(space, lang, options)
+  .then(function(loaded){
+    return _.defaults(config, loaded);
   });
 };
 
@@ -109,11 +106,12 @@ var mergeConfig = function(config, space, lang, options) {
   @param options.space: The space name or country code
   @param options.lang: The language code
   @param options.encoding: The encoding of the resource files (default: 'utf8')
+  @param options.mergeLevel: The merge depth to perform. 0=space and lang specific only |
+    1=space specific, no lang | 2=default space, lang specific | 3=default space and lang (default: 3)
 */
 module.exports.load = function(name, options) {
   options = options || {};
-  options.base_path = options.base_path || 'locales';
-  options.space = options.space || 'default';
+  _.defaults(options, { base_path: 'locales', space: 'default' });
 
   var space = options.space
     , lang = options.lang;
@@ -129,17 +127,29 @@ module.exports.load = function(name, options) {
     lang = loadDefaultLang(space, options);
   }
 
+  var depth = 0;
+
+  var depthExceeded = function(){
+    return ++depth > options.mergeLevel;
+  };
+
   // Load the most specific configuration
   return mergeConfig({}, space, lang, options)
   .then(function(config){
+    if(depthExceeded())
+      return config;
     // Then merge it with the space configuration
     return mergeConfig(config, space, null, options);
   })
   .then(function(config){
+    if(depthExceeded())
+      return config;
     // Then merge it with the language configuration
     return mergeConfig(config, 'default', lang, options);
   })
   .then(function(config){
+    if(depthExceeded())
+      return config;
     // Finally merge it with the default configuration
     return mergeConfig(config, 'default', null, options);
   })
