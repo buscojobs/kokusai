@@ -78,6 +78,12 @@ var loadContent = function(space, lang, options) {
   });
 };
 
+var saveContent = function(space, lang, options, data) {
+  var content = loadContent(space, lang, options).then(function(content) {
+    console.log(content);
+  });
+};
+
 // Loads the default language from base_path/space/lang.config
 var loadDefaultLang = function(space, options){
   var config_path = path.join(options.base_path, space, 'lang.config');
