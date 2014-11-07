@@ -38,10 +38,9 @@ Locale.prototype.get = function(key) {
   return undefined;
 };
 
-// Loads a configuration file
-var loadContent = function(space, lang, options) {
+// Given a filename and the localization settings, returns a filepath
+var setConfigPath = function(space, lang, options) {
   var parts = [ options.base_path ];
-  var encoding = options.encoding || 'utf8';
 
   if(typeof space === 'string')
     parts.push(space);
@@ -55,6 +54,13 @@ var loadContent = function(space, lang, options) {
   if(config_path.substring(config_path.length - 5) !== '.json') {
       config_path += '.json';
   }
+  return config_path;
+};
+
+// Loads a configuration file
+var loadContent = function(space, lang, options) {
+  var encoding = options.encoding || 'utf8'
+    , config_path = setConfigPath(space, lang, options);
 
   return new Promise(function(fulfill, reject){
     fs.exists(config_path, function(exists){
@@ -78,9 +84,18 @@ var loadContent = function(space, lang, options) {
   });
 };
 
-var saveContent = function(space, lang, options, data) {
-  var content = loadContent(space, lang, options).then(function(content) {
-    console.log(content);
+// Saves a configuration file
+var saveContent = function(name, options, data) {
+  return new Promise(function(fulfill, reject){
+    var encoding = options.encoding || 'utf8'
+      , config_path = setConfigPath(options.space, options.lang, options);
+
+    fs.writeFile(config_path, JSON5.stringify(data, null, '  '), function(err) {
+      if (err)
+        reject(err);
+      else
+        fulfill(data, options);
+    });
   });
 };
 
@@ -125,7 +140,7 @@ module.exports.load = function(name, options) {
 
   // If we found a proper configuration cached, we return it
   var cached = cache.getLocale(options);
-  if(cached){
+  if(cached && options.cache){
     return Promise.resolve(cached);
   }
 
@@ -165,5 +180,26 @@ module.exports.load = function(name, options) {
     cache.saveLocale(options, locale);
 
     return Promise.resolve(locale);
+  });
+};
+
+// Saves a localized configuration file
+module.exports.save = function(name, options, data) {
+  var space = options.space
+    , lang = options.lang;
+  options.name = name;
+
+  if(!lang){
+    lang = loadDefaultLang(space, options);
+  }
+
+  // Load the most specific configuration (is the only one we need)
+  return mergeConfig(data, space, lang, options)
+  .then(function(config){
+    return saveContent(name, options, config);
+  }).then(function(data) {
+    Promise.resolve(data);
+  }).catch(function(err) {
+    console.trace(err);
   });
 };
